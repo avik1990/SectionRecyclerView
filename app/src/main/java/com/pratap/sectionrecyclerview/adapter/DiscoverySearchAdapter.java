@@ -1,23 +1,32 @@
-package com.pratap.sectionrecyclerview.utils;
+package com.pratap.sectionrecyclerview.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.pratap.sectionrecyclerview.MainActivity;
 import com.pratap.sectionrecyclerview.R;
 import com.pratap.sectionrecyclerview.models.DiscoveryInstantSearchModel;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DiscoverySearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class DiscoverySearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
 
     Context context;
     public static final int ITEM_TYPE_USERHEADER = 0;
@@ -26,13 +35,14 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public static final int ITEM_TYPE_TRIPHEADER = 3;
     public static final int ITEM_TYPE_TRIPITEM = 4;
     public static final int ITEM_TYPE_DIVIDER = 5;
-
     List<DiscoveryInstantSearchModel> list_discoveryInstantSearchModel;
     String header = "";
+    private List<DiscoveryInstantSearchModel> searchfiltered;
 
     public DiscoverySearchAdapter(Context context, List<DiscoveryInstantSearchModel> list_discoveryInstantSearchModel) {
         this.context = context;
         this.list_discoveryInstantSearchModel = list_discoveryInstantSearchModel;
+        this.searchfiltered = list_discoveryInstantSearchModel;
     }
 
     @Override
@@ -40,6 +50,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view;
         RecyclerView.ViewHolder holder = null;
+
         switch (viewType) {
             case ITEM_TYPE_USERHEADER:
                 header = "Users";
@@ -106,17 +117,43 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     private void TripDataSetter(TripViewHolder tripViewHolder, int i) {
         tripViewHolder.tvName.setText(list_discoveryInstantSearchModel.get(i).getTripName());
+        String userTriptName = list_discoveryInstantSearchModel.get(i).getTripName().toLowerCase(Locale.getDefault());
+
+        String searchString = "ge";
+        if (userTriptName.contains(searchString)) {
+            Log.e("test", userTriptName + " contains: " + searchString);
+            int startPos = userTriptName.indexOf(searchString);
+            int endPos = startPos + searchString.length();
+
+            Spannable spanText = Spannable.Factory.getInstance().newSpannable(tripViewHolder.tvName.getText());
+            spanText.setSpan(new ForegroundColorSpan(Color.RED), startPos, endPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            tripViewHolder.tvName.setText(spanText, TextView.BufferType.SPANNABLE);
+        }
     }
 
     private void UserDataSetter(UserViewHolder userviewViewHolder, int i) {
         userviewViewHolder.tvName.setText(list_discoveryInstantSearchModel.get(i).getUserFirstName() + " " + list_discoveryInstantSearchModel.get(i).getUserLastName());
         userviewViewHolder.tvUsername.setText(list_discoveryInstantSearchModel.get(i).getUserName());
+        String userFirstName = list_discoveryInstantSearchModel.get(i).getUserFirstName().toLowerCase(Locale.getDefault());
+        String searchString = "ro";
+        if (userFirstName.contains(searchString)) {
+            Log.e("test", userFirstName + " contains: " + searchString);
+            int startPos = userFirstName.indexOf(searchString);
+            int endPos = startPos + searchString.length();
+
+            Spannable spanText = Spannable.Factory.getInstance().newSpannable(userviewViewHolder.tvName.getText()); // <- EDITED: Use the original string, as `country` has been converted to lowercase.
+            spanText.setSpan(new ForegroundColorSpan(Color.RED), startPos, endPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            userviewViewHolder.tvName.setText(spanText, TextView.BufferType.SPANNABLE);
+        }
+
     }
 
 
     @Override
     public int getItemCount() {
-        return list_discoveryInstantSearchModel.size();
+        return searchfiltered.size();
     }
 
 
@@ -138,6 +175,10 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             return ITEM_TYPE_TRIPITEM;
         }
     }
+
+    public void setQuery(String s) {
+    }
+
 
     public class HeaderViewHolder extends RecyclerView.ViewHolder {
 
@@ -162,6 +203,8 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             avatar = itemView.findViewById(R.id.avatar);
             tvName = itemView.findViewById(R.id.tvName);
             tvUsername = itemView.findViewById(R.id.tvUsername);
+
+
         }
     }
 
@@ -194,4 +237,47 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             super(itemView);
         }
     }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    searchfiltered = list_discoveryInstantSearchModel;
+                } else {
+                    List<DiscoveryInstantSearchModel> filteredList = new ArrayList<>();
+                    for (DiscoveryInstantSearchModel row : list_discoveryInstantSearchModel) {
+
+                        // name match condition. this might differ depending on your requirement
+                        // here we are looking for name or phone number match
+                        if (row.getUserFirstName().toLowerCase().trim().contains(charString.toLowerCase().trim()) || row.getTripName().toLowerCase().trim().contains(charString.toLowerCase().trim())) {
+                            Log.d("UserName1", row.getTripName().trim());
+                            filteredList.add(row);
+                        }
+                    }
+
+                    searchfiltered = filteredList;
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = searchfiltered;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                Log.d("Results", "" + "CALLED");
+                searchfiltered = (ArrayList<DiscoveryInstantSearchModel>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
+
+    public interface ContactsAdapterListener {
+        void onContactSelected(DiscoveryInstantSearchModel contact);
+    }
+
 }

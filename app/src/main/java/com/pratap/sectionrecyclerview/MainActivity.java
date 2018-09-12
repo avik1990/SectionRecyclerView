@@ -6,24 +6,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 
+import com.pratap.sectionrecyclerview.adapter.DiscoverySearchAdapter;
 import com.pratap.sectionrecyclerview.models.DiscoveryInstantSearchModel;
 import com.pratap.sectionrecyclerview.models.TripModel;
 import com.pratap.sectionrecyclerview.models.UserModel;
-import com.pratap.sectionrecyclerview.utils.DiscoverySearchAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.pratap.sectionrecyclerview.utils.DiscoverySearchAdapter.ITEM_TYPE_DIVIDER;
-import static com.pratap.sectionrecyclerview.utils.DiscoverySearchAdapter.ITEM_TYPE_TRIPHEADER;
-import static com.pratap.sectionrecyclerview.utils.DiscoverySearchAdapter.ITEM_TYPE_TRIPITEM;
-import static com.pratap.sectionrecyclerview.utils.DiscoverySearchAdapter.ITEM_TYPE_USERHEADER;
-import static com.pratap.sectionrecyclerview.utils.DiscoverySearchAdapter.ITEM_TYPE_USERITEM;
-import static com.pratap.sectionrecyclerview.utils.DiscoverySearchAdapter.ITEM_TYPE_USERSEEMORE;
+import static com.pratap.sectionrecyclerview.adapter.DiscoverySearchAdapter.ITEM_TYPE_DIVIDER;
+import static com.pratap.sectionrecyclerview.adapter.DiscoverySearchAdapter.ITEM_TYPE_TRIPHEADER;
+import static com.pratap.sectionrecyclerview.adapter.DiscoverySearchAdapter.ITEM_TYPE_TRIPITEM;
+import static com.pratap.sectionrecyclerview.adapter.DiscoverySearchAdapter.ITEM_TYPE_USERHEADER;
+import static com.pratap.sectionrecyclerview.adapter.DiscoverySearchAdapter.ITEM_TYPE_USERITEM;
+import static com.pratap.sectionrecyclerview.adapter.DiscoverySearchAdapter.ITEM_TYPE_USERSEEMORE;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DiscoverySearchAdapter.ContactsAdapterListener {
 
     private Toolbar toolbar;
     List<DiscoveryInstantSearchModel> list_discoveryInstantSearchModel = new ArrayList<>();
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     LinearLayoutManager linearLayoutManager;
     DiscoverySearchAdapter discoverySearchAdapter;
     Context context;
+    EditText etSearch;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,26 @@ public class MainActivity extends AppCompatActivity {
         list_user = new ArrayList<>();
         list_trip_model = new ArrayList<>();
         my_recycler_view = (RecyclerView) findViewById(R.id.my_recycler_view);
+        etSearch = findViewById(R.id.etSearch);
+        etSearch.requestFocus();
+        etSearch.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() != 0)
+                    discoverySearchAdapter.getFilter().filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     private void inflateview() {
@@ -78,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         ///fill userlist
         ///String userId, String userName, String userFirstName, String userLastName, String userProfilePic
         list_user.add(new UserModel("1", "@roxy", "Roxy", "Sinny", ""));
-        list_user.add(new UserModel("2", "@roxy", "Roxy1", "Sinny", ""));
+        list_user.add(new UserModel("2", "@roxy", "Roxroy1", "Sinny", ""));
         list_user.add(new UserModel("3", "@roxy", "Roxy2", "Sinny", ""));
         list_user.add(new UserModel("4", "@roxy", "Roxy3", "Sinny", ""));
         list_user.add(new UserModel("5", "@roxy", "Roxy4", "Sinny", ""));
@@ -90,15 +114,15 @@ public class MainActivity extends AppCompatActivity {
         list_user.add(new UserModel("11", "@roxy", "Roxy10", "Sinny", ""));
         ////fill triplist
         ///String tripId, String tripName, String tripCoverPic
-        list_trip_model.add(new TripModel("1", "Greman Trip", ""));
+        list_trip_model.add(new TripModel("1", "German Trip", ""));
         list_trip_model.add(new TripModel("2", "American Trip", ""));
         list_trip_model.add(new TripModel("3", "England Trip", ""));
         list_trip_model.add(new TripModel("4", "Usa Trip", ""));
-        list_trip_model.add(new TripModel("5", "Greman Trip1", ""));
-        list_trip_model.add(new TripModel("6", "Greman Trip2", ""));
-        list_trip_model.add(new TripModel("7", "Greman Trip3", ""));
-        list_trip_model.add(new TripModel("8", "Greman Trip4", ""));
-        list_trip_model.add(new TripModel("9", "Greman Trip5", ""));
+        list_trip_model.add(new TripModel("5", "German Trip1", ""));
+        list_trip_model.add(new TripModel("6", "German Trip2", ""));
+        list_trip_model.add(new TripModel("7", "German Trip3", ""));
+        list_trip_model.add(new TripModel("8", "German Trip4", ""));
+        list_trip_model.add(new TripModel("9", "German Trip5", ""));
 
 
         mergeFewData();
@@ -133,9 +157,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        for (int i = 0; i < list_discoveryInstantSearchModel.size(); i++) {
+      /*  for (int i = 0; i < list_discoveryInstantSearchModel.size(); i++) {
             Log.d("TripFlags", "" + list_discoveryInstantSearchModel.get(i).getItemType());
-        }
+        }*/
 
 
     }
@@ -164,30 +188,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-   /* private void populateSampleData() {
-        int l = 4;
-        for (int i = 1; i <= 2; i++) {
+    @Override
+    public void onContactSelected(DiscoveryInstantSearchModel contact) {
 
-            DataModel dm = new DataModel();
-
-            dm.setHeaderTitle("Section " + i);
-
-            ArrayList<String> singleItem = new ArrayList<>();
-            if (i == 1) {
-                l = 4;
-            } else {
-                l = 10;
-            }
-
-            for (int j = 1; j <= l; j++) {
-
-                singleItem.add("Item " + j);
-            }
-
-            dm.setAllItemsInSection(singleItem);
-
-            allSampleData.add(dm);
-
-        }
-    }*/
+    }
 }
