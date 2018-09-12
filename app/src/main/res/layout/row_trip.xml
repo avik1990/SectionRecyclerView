@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llRowLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingBottom="8dp"
+    android:paddingLeft="14dp"
+    android:paddingRight="14dp"
+    android:paddingTop="8dp">
+
+    <ImageView
+        android:id="@+id/ivTripPhoto"
+        android:layout_width="60dp"
+        android:layout_height="45dp"
+        android:src="@drawable/bg_dimmer_rounded" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="8dp">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/tvName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:fontFamily="@font/circular_std_medium"
+            android:text="adasdasdadsada"
+            android:textColor="@color/gray_888"
+            android:textSize="12sp"
+            tools:text="dscdsds" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/tvUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:fontFamily="@font/circular_std_medium"
+            android:text="adasdasdadsada"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:text="dscdsds" />
+    </LinearLayout>
+</LinearLayout>
